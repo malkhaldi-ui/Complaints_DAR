@@ -5,10 +5,12 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f4f7f6;
+            background-color: #f0f8ff; /* Light blue background */
             color: #333;
             margin: 0;
             padding: 20px;
+            direction: rtl; /* For right-to-left layout */
+            text-align: right;
         }
         .form-container {
             max-width: 650px;
@@ -17,6 +19,11 @@
             padding: 30px 40px;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 20px auto;
+            max-width: 150px; /* Adjust logo size as needed */
         }
         h2 {
             text-align: center;
@@ -81,6 +88,7 @@
 <body>
 
 <div class="form-container">
+    <img src="https://raw.githubusercontent.com/malkhaldi-ui/DAR_Logo/main/dar.png" alt="Dar Organization Logo" class="logo">
     <h2>تقديم شكوى أو اقتراح</h2>
     <form id="complaintForm">
         <div class="form-group">
@@ -90,7 +98,7 @@
 
         <div class="form-group">
             <label for="phone">رقم الهاتف/الواتساب:</label>
-            <input type="tel" id="phone" name="phone" required>
+            <input type="tel" id="phone" name="phone" pattern="[0-9]+" title="يرجى إدخال أرقام فقط" required>
         </div>
 
         <div class="form-group">
@@ -144,11 +152,8 @@
         const suggestionTypeSelect = document.getElementById('suggestionType');
 
         mainTypeSelect.addEventListener('change', function() {
-            // Hide all sub-type groups
             complaintTypeGroup.classList.add('hidden');
             suggestionTypeGroup.classList.add('hidden');
-
-            // Reset required attribute
             complaintTypeSelect.removeAttribute('required');
             suggestionTypeSelect.removeAttribute('required');
 
@@ -171,7 +176,6 @@
             const formData = new FormData(this);
             const messageElement = document.getElementById('responseMessage');
 
-            // Show loading message
             messageElement.style.display = 'block';
             messageElement.className = 'success';
             messageElement.innerText = 'جاري الإرسال...';
@@ -185,7 +189,6 @@
                 messageElement.className = 'success';
                 messageElement.innerText = 'تم إرسال شكواك بنجاح. شكراً لك!';
                 form.reset();
-                // Hide sub-type groups after reset
                 complaintTypeGroup.classList.add('hidden');
                 suggestionTypeGroup.classList.add('hidden');
             })
