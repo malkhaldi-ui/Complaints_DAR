@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complaint & Feedback Form</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .form-container {
+            max-width: 650px;
+            margin: 40px auto;
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #1e88e5;
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        input[type="text"], input[type="tel"], textarea, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #1e88e5;
+            outline: none;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        button {
+            width: 100%;
+            background-color: #1e88e5;
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #1565c0;
+        }
+        #responseMessage {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            color: white;
+            display: none;
+        }
+        .success {
+            background-color: #4CAF50;
+        }
+        .error {
+            background-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>تقديم شكوى أو اقتراح</h2>
+    <form id="complaintForm">
+        <div class="form-group">
+            <label for="fullName">الاسم الكامل:</label>
+            <input type="text" id="fullName" name="fullName" required>
+        </div>
+
+        <div class="form-group">
+            <label for="phone">رقم الهاتف/الواتساب:</label>
+            <input type="tel" id="phone" name="phone" required>
+        </div>
+
+        <div class="form-group">
+            <label for="location">الموقع:</label>
+            <input type="text" id="location" name="location" required>
+        </div>
+
+        <div class="form-group">
+            <label for="mainType">النوع:</label>
+            <select id="mainType" name="mainType" required>
+                <option value="">-- اختر النوع --</option>
+                <option value="Complaint">شكوى</option>
+                <option value="Suggestion">اقتراح</option>
+            </select>
+        </div>
+
+        <div class="form-group hidden" id="complaintTypeGroup">
+            <label for="complaintType">نوع الشكوى:</label>
+            <select id="complaintType" name="subType">
+                <option value="">-- اختر نوع الشكوى --</option>
+                <option value="Sensitive">شكوى حساسة</option>
+                <option value="Programmatic">شكوى برامجية</option>
+            </select>
+        </div>
+
+        <div class="form-group hidden" id="suggestionTypeGroup">
+            <label for="suggestionType">نوع الاقتراح:</label>
+            <select id="suggestionType" name="subType">
+                <option value="">-- اختر نوع الاقتراح --</option>
+                <option value="Future Planning">تخطيط مستقبلي</option>
+                <option value="Immediate Improvements">تحسينات فورية</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="details">تفاصيل الشكوى/الاقتراح:</label>
+            <textarea id="details" name="details" rows="5" required></textarea>
+        </div>
+        
+        <button type="submit">إرسال</button>
+    </form>
+    <div id="responseMessage"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mainTypeSelect = document.getElementById('mainType');
+        const complaintTypeGroup = document.getElementById('complaintTypeGroup');
+        const suggestionTypeGroup = document.getElementById('suggestionTypeGroup');
+        const complaintTypeSelect = document.getElementById('complaintType');
+        const suggestionTypeSelect = document.getElementById('suggestionType');
+
+        mainTypeSelect.addEventListener('change', function() {
+            // Hide all sub-type groups
+            complaintTypeGroup.classList.add('hidden');
+            suggestionTypeGroup.classList.add('hidden');
+
+            // Reset required attribute
+            complaintTypeSelect.removeAttribute('required');
+            suggestionTypeSelect.removeAttribute('required');
+
+            if (this.value === 'Complaint') {
+                complaintTypeGroup.classList.remove('hidden');
+                complaintTypeSelect.setAttribute('required', 'required');
+            } else if (this.value === 'Suggestion') {
+                suggestionTypeGroup.classList.remove('hidden');
+                suggestionTypeSelect.setAttribute('required', 'required');
+            }
+        });
+
+        const form = document.getElementById('complaintForm');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Replace with your Web App URL
+            const webAppUrl = "https://script.google.com/macros/s/AKfycbzde98Cylrepb49NX2oWrMbEEptp4vbVFp9adejeSZPG70nt1-eg0MIuEcjOozi-zh9-A/exec"; 
+            
+            const formData = new FormData(this);
+            const messageElement = document.getElementById('responseMessage');
+
+            // Show loading message
+            messageElement.style.display = 'block';
+            messageElement.className = 'success';
+            messageElement.innerText = 'جاري الإرسال...';
+
+            fetch(webAppUrl, {
+                method: 'POST',
+                body: formData,
+                mode: 'no-cors'
+            })
+            .then(() => {
+                messageElement.className = 'success';
+                messageElement.innerText = 'تم إرسال شكواك بنجاح. شكراً لك!';
+                form.reset();
+                // Hide sub-type groups after reset
+                complaintTypeGroup.classList.add('hidden');
+                suggestionTypeGroup.classList.add('hidden');
+            })
+            .catch(error => {
+                messageElement.className = 'error';
+                messageElement.innerText = 'حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.';
+                console.error('Error:', error);
+            });
+        });
+    });
+</script>
+</body>
+</html>
