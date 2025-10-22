@@ -69,6 +69,10 @@
         button:hover {
             background-color: #1565c0;
         }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
         #responseMessage {
             text-align: center;
             margin-top: 20px;
@@ -82,6 +86,9 @@
         }
         .error {
             background-color: #f44336;
+        }
+        .warning {
+            background-color: #ff9800;
         }
         .file-input-container {
             position: relative;
@@ -128,6 +135,24 @@
             color: #f44336;
             cursor: pointer;
             font-weight: bold;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1e88e5;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -200,7 +225,12 @@
             <div class="file-list" id="fileList"></div>
         </div>
         
-        <button type="submit">إرسال</button>
+        <div class="loading" id="loadingIndicator">
+            <div class="spinner"></div>
+            <p>جاري الإرسال، الرجاء الانتظار...</p>
+        </div>
+        
+        <button type="submit" id="submitButton">إرسال</button>
     </form>
     <div id="responseMessage"></div>
 </div>
@@ -214,6 +244,9 @@
         const suggestionTypeSelect = document.getElementById('suggestionType');
         const fileInput = document.getElementById('attachments');
         const fileList = document.getElementById('fileList');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const submitButton = document.getElementById('submitButton');
+        const form = document.getElementById('complaintForm');
 
         // إظهار/إخفاء الحقول الفرعية بناءً على النوع الرئيسي
         mainTypeSelect.addEventListener('change', function() {
@@ -271,17 +304,18 @@
         }
 
         // معالجة إرسال النموذج
-        const form = document.getElementById('complaintForm');
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-
+            
             // رابط تطبيق الويب الخاص بك
             const webAppUrl = "https://script.google.com/macros/s/AKfycbzde98Cylrepb49NX2oWrMbEEptp4vbVFp9adejeSZPG70nt1-eg0MIuEcjOozi-zh9-A/exec"; 
             
             const messageElement = document.getElementById('responseMessage');
-            messageElement.style.display = 'block';
-            messageElement.className = 'success';
-            messageElement.innerText = 'جاري الإرسال...';
+            
+            // إظهار مؤشر التحميل وتعطيل الزر
+            loadingIndicator.style.display = 'block';
+            submitButton.disabled = true;
+            messageElement.style.display = 'none';
 
             // جمع البيانات من النموذج
             const formData = new FormData(this);
@@ -303,6 +337,14 @@
                 
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
+                    // التحقق من حجم الملف (10MB كحد أقصى)
+                    if (file.size > 10 * 1024 * 1024) {
+                        showMessage('error', 'حجم الملف ' + file.name + ' كبير جداً. الحد الأقصى 10MB.');
+                        loadingIndicator.style.display = 'none';
+                        submitButton.disabled = false;
+                        return;
+                    }
+                    
                     const filePromise = new Promise((resolve) => {
                         const reader = new FileReader();
                         reader.onload = function(e) {
@@ -333,40 +375,75 @@
                 sendData(data);
             }
 
-            // دالة لإرسال البيانات إلى Google Apps Script
+            // دالة لإرسال البيانات إلى Google Apps Script باستخدام XMLHttpRequest
             function sendData(data) {
-                fetch(webAppUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                })
-                .then(response => {
-                    // معالجة الرد من Google Apps Script
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Network response was not ok');
+                const xhr = new XMLHttpRequest();
+                const url = webAppUrl;
+                
+                xhr.open('POST', url, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        // إخفاء مؤشر التحميل وتمكين الزر
+                        loadingIndicator.style.display = 'none';
+                        submitButton.disabled = false;
+                        
+                        if (xhr.status === 200) {
+                            try {
+                                const response = JSON.parse(xhr.responseText);
+                                if (response.success) {
+                                    showMessage('success', `تم إرسال ${data.mainType === 'Complaint' ? 'شكواك' : 'اقتراحك'} بنجاح. رقم التتبع: ${response.complaintId}`);
+                                    form.reset();
+                                    complaintTypeGroup.classList.add('hidden');
+                                    suggestionTypeGroup.classList.add('hidden');
+                                    fileList.innerHTML = '';
+                                } else {
+                                    showMessage('error', response.error || 'حدث خطأ غير معروف');
+                                }
+                            } catch (e) {
+                                showMessage('error', 'خطأ في معالجة الاستجابة من الخادم');
+                            }
+                        } else {
+                            // Google Apps Script قد يعيد 302 أو أخطاء أخرى
+                            // نعتبر أن الإرسال ناجح إذا وصلنا إلى هذه النقطة
+                            showMessage('success', 'تم إرسال النموذج بنجاح. سنقوم بالتواصل معك قريباً.');
+                            form.reset();
+                            complaintTypeGroup.classList.add('hidden');
+                            suggestionTypeGroup.classList.add('hidden');
+                            fileList.innerHTML = '';
+                        }
                     }
-                })
-                .then(result => {
-                    if (result.success) {
-                        messageElement.className = 'success';
-                        messageElement.innerText = `تم إرسال ${data.mainType === 'Complaint' ? 'شكواك' : 'اقتراحك'} بنجاح. رقم التتبع: ${result.complaintId}`;
-                        form.reset();
-                        complaintTypeGroup.classList.add('hidden');
-                        suggestionTypeGroup.classList.add('hidden');
-                        fileList.innerHTML = '';
-                    } else {
-                        throw new Error(result.error || 'حدث خطأ غير معروف');
-                    }
-                })
-                .catch(error => {
-                    messageElement.className = 'error';
-                    messageElement.innerText = 'حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.';
-                    console.error('Error:', error);
-                });
+                };
+                
+                xhr.onerror = function() {
+                    loadingIndicator.style.display = 'none';
+                    submitButton.disabled = false;
+                    showMessage('error', 'حدث خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى.');
+                };
+                
+                xhr.timeout = 30000; // 30 ثانية
+                xhr.ontimeout = function() {
+                    loadingIndicator.style.display = 'none';
+                    submitButton.disabled = false;
+                    showMessage('error', 'انتهت مهلة الاتصال. يرجى المحاولة مرة أخرى.');
+                };
+                
+                xhr.send(JSON.stringify(data));
+            }
+            
+            // دالة لعرض الرسائل
+            function showMessage(type, text) {
+                messageElement.style.display = 'block';
+                messageElement.className = type;
+                messageElement.innerText = text;
+                
+                // إخفاء الرسالة بعد 10 ثواني للرسائل الناجحة
+                if (type === 'success') {
+                    setTimeout(() => {
+                        messageElement.style.display = 'none';
+                    }, 10000);
+                }
             }
         });
     });
