@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Complaint & Feedback Form</title>
+    <title>نموذج الشكاوى والاقتراحات</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f0f8ff; /* Light blue background */
+            background-color: #f0f8ff;
             color: #333;
             margin: 0;
             padding: 20px;
-            direction: rtl; /* For right-to-left layout */
+            direction: rtl;
             text-align: right;
         }
         .form-container {
@@ -23,7 +23,7 @@
         .logo {
             display: block;
             margin: 0 auto 20px auto;
-            max-width: 150px; /* Adjust logo size as needed */
+            max-width: 150px;
         }
         h2 {
             text-align: center;
@@ -83,6 +83,52 @@
         .error {
             background-color: #f44336;
         }
+        .file-input-container {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        .file-input-container input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .file-input-button {
+            display: block;
+            padding: 12px;
+            background: #f5f5f5;
+            border: 1px dashed #ccc;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .file-input-button:hover {
+            background: #e9e9e9;
+        }
+        .file-list {
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+        .remove-file {
+            color: #f44336;
+            cursor: pointer;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -134,8 +180,24 @@
         </div>
         
         <div class="form-group">
+            <label for="expectedAction">الإجراء المتوقع:</label>
+            <textarea id="expectedAction" name="expectedAction" rows="3" required></textarea>
+        </div>
+        
+        <div class="form-group">
             <label for="details">تفاصيل الشكوى/الاقتراح:</label>
             <textarea id="details" name="details" rows="5" required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>المرفقات (اختياري):</label>
+            <div class="file-input-container">
+                <div class="file-input-button">
+                    <span>انقر لاختيار الملفات</span>
+                </div>
+                <input type="file" id="attachments" name="attachments" multiple>
+            </div>
+            <div class="file-list" id="fileList"></div>
         </div>
         
         <button type="submit">إرسال</button>
@@ -150,7 +212,10 @@
         const suggestionTypeGroup = document.getElementById('suggestionTypeGroup');
         const complaintTypeSelect = document.getElementById('complaintType');
         const suggestionTypeSelect = document.getElementById('suggestionType');
+        const fileInput = document.getElementById('attachments');
+        const fileList = document.getElementById('fileList');
 
+        // إظهار/إخفاء الحقول الفرعية بناءً على النوع الرئيسي
         mainTypeSelect.addEventListener('change', function() {
             complaintTypeGroup.classList.add('hidden');
             suggestionTypeGroup.classList.add('hidden');
@@ -166,37 +231,143 @@
             }
         });
 
+        // عرض الملفات المختارة
+        fileInput.addEventListener('change', function() {
+            fileList.innerHTML = '';
+            if (this.files.length > 0) {
+                for (let i = 0; i < this.files.length; i++) {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.innerHTML = `
+                        <span>${this.files[i].name}</span>
+                        <span class="remove-file" data-index="${i}">✕</span>
+                    `;
+                    fileList.appendChild(fileItem);
+                }
+                
+                // إضافة إمكانية إزالة الملفات
+                document.querySelectorAll('.remove-file').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        removeFile(index);
+                    });
+                });
+            }
+        });
+
+        // دالة لإزالة ملف من القائمة
+        function removeFile(index) {
+            const dt = new DataTransfer();
+            const files = fileInput.files;
+            
+            for (let i = 0; i < files.length; i++) {
+                if (i !== index) {
+                    dt.items.add(files[i]);
+                }
+            }
+            
+            fileInput.files = dt.files;
+            fileInput.dispatchEvent(new Event('change'));
+        }
+
+        // معالجة إرسال النموذج
         const form = document.getElementById('complaintForm');
         form.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // Replace with your Web App URL
+            // رابط تطبيق الويب الخاص بك
             const webAppUrl = "https://script.google.com/macros/s/AKfycbzde98Cylrepb49NX2oWrMbEEptp4vbVFp9adejeSZPG70nt1-eg0MIuEcjOozi-zh9-A/exec"; 
             
-            const formData = new FormData(this);
             const messageElement = document.getElementById('responseMessage');
-
             messageElement.style.display = 'block';
             messageElement.className = 'success';
             messageElement.innerText = 'جاري الإرسال...';
 
-            fetch(webAppUrl, {
-                method: 'POST',
-                body: formData,
-                mode: 'no-cors'
-            })
-            .then(() => {
-                messageElement.className = 'success';
-                messageElement.innerText = 'تم إرسال شكواك بنجاح. شكراً لك!';
-                form.reset();
-                complaintTypeGroup.classList.add('hidden');
-                suggestionTypeGroup.classList.add('hidden');
-            })
-            .catch(error => {
-                messageElement.className = 'error';
-                messageElement.innerText = 'حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.';
-                console.error('Error:', error);
-            });
+            // جمع البيانات من النموذج
+            const formData = new FormData(this);
+            const data = {
+                fullName: formData.get('fullName'),
+                phone: formData.get('phone'),
+                location: formData.get('location'),
+                mainType: formData.get('mainType'),
+                subType: formData.get('subType'),
+                expectedAction: formData.get('expectedAction'),
+                details: formData.get('details'),
+                attachments: []
+            };
+
+            // معالجة المرفقات إذا وجدت
+            const files = fileInput.files;
+            if (files.length > 0) {
+                const filePromises = [];
+                
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const filePromise = new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const base64 = e.target.result.split(',')[1];
+                            resolve({
+                                fileName: file.name,
+                                mimeType: file.type,
+                                data: base64
+                            });
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                    filePromises.push(filePromise);
+                }
+                
+                // الانتظار حتى يتم تحويل جميع الملفات إلى base64
+                Promise.all(filePromises)
+                    .then(fileData => {
+                        data.attachments = fileData;
+                        sendData(data);
+                    })
+                    .catch(error => {
+                        console.error('Error processing files:', error);
+                        data.attachments = [];
+                        sendData(data);
+                    });
+            } else {
+                sendData(data);
+            }
+
+            // دالة لإرسال البيانات إلى Google Apps Script
+            function sendData(data) {
+                fetch(webAppUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    // معالجة الرد من Google Apps Script
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Network response was not ok');
+                    }
+                })
+                .then(result => {
+                    if (result.success) {
+                        messageElement.className = 'success';
+                        messageElement.innerText = `تم إرسال ${data.mainType === 'Complaint' ? 'شكواك' : 'اقتراحك'} بنجاح. رقم التتبع: ${result.complaintId}`;
+                        form.reset();
+                        complaintTypeGroup.classList.add('hidden');
+                        suggestionTypeGroup.classList.add('hidden');
+                        fileList.innerHTML = '';
+                    } else {
+                        throw new Error(result.error || 'حدث خطأ غير معروف');
+                    }
+                })
+                .catch(error => {
+                    messageElement.className = 'error';
+                    messageElement.innerText = 'حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.';
+                    console.error('Error:', error);
+                });
+            }
         });
     });
 </script>
