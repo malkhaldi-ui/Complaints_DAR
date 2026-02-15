@@ -1,234 +1,839 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-    <title>نموذج الشكاوى والاقتراحات</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نموذج الشكاوى والاقتراحات - دار للسلام والازدهار</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f8ff;
-            color: #333;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #3C6255;
+            --secondary: #9CAF88;
+            --accent: #FFD700;
+            --light: #F5F5F5;
+            --dark: #2A4A3D;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #1e88e5;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            color: #333;
             padding: 20px;
-            direction: rtl;
-            text-align: right;
         }
-        .form-container {
-            max-width: 650px;
-            margin: 40px auto;
-            background-color: #fff;
-            padding: 30px 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
         }
-        .logo {
-            display: block;
-            margin: 0 auto 20px auto;
-            max-width: 150px;
-        }
-        h2 {
+
+        /* الهيدر */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            color: white;
+            padding: 30px 0;
             text-align: center;
-            color: #1e88e5;
+            border-radius: 15px 15px 0 0;
+            margin-bottom: 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 10s linear infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .logo {
+            background: white;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo:hover {
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        .logo i {
+            color: var(--primary);
+            font-size: 48px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* شريط التنقل */
+        .breadcrumb {
+            background: var(--secondary);
+            padding: 15px 25px;
+            color: white;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .breadcrumb .separator {
+            opacity: 0.7;
+            margin: 0 5px;
+        }
+
+        /* بطاقة النموذج */
+        .card {
+            background: white;
+            border-radius: 0 0 15px 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            border-top: 5px solid var(--secondary);
+        }
+
+        .form-title {
+            color: var(--primary);
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .form-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+
+        /* مجموعة الحقول */
+        .form-group {
             margin-bottom: 25px;
         }
-        label {
+
+        .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 600;
+            color: var(--dark);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        input[type="text"], input[type="tel"], textarea, select {
+
+        .form-group label i {
+            color: var(--primary);
+            width: 20px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-        input:focus, select:focus, textarea:focus {
-            border-color: #1e88e5;
-            outline: none;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .hidden {
-            display: none;
-        }
-        button {
-            width: 100%;
-            background-color: #1e88e5;
-            color: white;
-            padding: 15px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #1565c0;
-        }
-        .success-message {
-            text-align: center;
-            margin: 20px 0;
             padding: 15px;
-            border-radius: 5px;
-            background-color: #4CAF50;
-            color: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #fafafa;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(156, 175, 136, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* مجموعة الحقول الفرعية */
+        .sub-group {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 10px;
+            border-right: 4px solid var(--secondary);
+        }
+
+        .sub-group.hidden {
             display: none;
         }
+
+        /* زر الإرسال */
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(60, 98, 85, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn i {
+            transition: transform 0.3s;
+        }
+
+        .submit-btn:hover i {
+            transform: translateX(-5px);
+        }
+
+        /* مؤشر التحميل */
         .loading {
             display: none;
             text-align: center;
             margin: 20px 0;
-            color: #1e88e5;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--secondary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            color: var(--primary);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* رسائل التنبيه */
+        .alert {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: var(--success);
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-success i {
+            color: var(--success);
+            margin-left: 8px;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: var(--danger);
+            border: 1px solid #f5c6cb;
+        }
+
+        /* معلومات إضافية */
+        .info-box {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-right: 4px solid var(--info);
+        }
+
+        .info-box i {
+            color: var(--info);
+            font-size: 24px;
+        }
+
+        .info-box p {
+            color: #555;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* الفوتر */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #666;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+
+        .footer i {
+            margin: 0 5px;
+        }
+
+        /* متجاوب */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .card {
+                padding: 25px;
+            }
+            
+            .header h1 {
+                font-size: 26px;
+            }
+            
+            .header p {
+                font-size: 16px;
+            }
+            
+            .form-title {
+                font-size: 24px;
+            }
+            
+            .breadcrumb {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 20px 0;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .logo {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .logo i {
+                font-size: 36px;
+            }
+            
+            .info-box {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* تلميحات */
+        .hint {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .hint i {
+            color: var(--secondary);
+            font-size: 12px;
+        }
+
+        /* تأثيرات حركية */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <!-- الهيدر -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-hands-helping"></i>
+            </div>
+            <h1>دار للسلام والازدهار</h1>
+            <p>Dar for Peace and Prosperity</p>
+        </header>
 
-<div class="form-container">
-    <img src="https://raw.githubusercontent.com/malkhaldi-ui/DAR_Logo/main/dar.png" alt="Dar Organization Logo" class="logo">
-    <h2>تقديم شكوى أو اقتراح</h2>
+        <!-- شريط التنقل -->
+        <div class="breadcrumb">
+            <span><i class="fas fa-home"></i> الرئيسية</span>
+            <span class="separator">›</span>
+            <span><i class="fas fa-headset"></i> خدمة العملاء</span>
+            <span class="separator">›</span>
+            <span style="font-weight: bold;"><i class="fas fa-comment-alt"></i> شكاوى واقتراحات</span>
+        </div>
 
-    <!-- رسالة النجاح -->
-    <div id="successMessage" class="success-message">
-        ✅ تم إرسال النموذج بنجاح! شكراً لك.
+        <!-- بطاقة النموذج -->
+        <div class="card">
+            <h2 class="form-title">
+                <i class="fas fa-comment-dots"></i>
+                تقديم شكوى أو اقتراح
+            </h2>
+
+            <!-- رسالة النجاح -->
+            <div id="successMessage" class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span>✅ تم إرسال النموذج بنجاح! شكراً لك.</span>
+            </div>
+
+            <!-- رسالة الخطأ -->
+            <div id="errorMessage" class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>❌ حدث خطأ، يرجى المحاولة مرة أخرى.</span>
+            </div>
+
+            <!-- مؤشر التحميل -->
+            <div id="loadingIndicator" class="loading">
+                <div class="spinner"></div>
+                <p><i class="fas fa-hourglass-half"></i> جاري الإرسال، الرجاء الانتظار...</p>
+            </div>
+
+            <!-- النموذج -->
+            <form id="complaintForm" action="https://script.google.com/macros/s/AKfycbzde98Cylrepb49NX2oWrMbEEptp4vbVFp9adejeSZPG70nt1-eg0MIuEcjOozi-zh9-A/exec" method="POST" target="hiddenFrame">
+                
+                <!-- الاسم الكامل -->
+                <div class="form-group">
+                    <label for="fullName">
+                        <i class="fas fa-user"></i>
+                        الاسم الكامل:
+                    </label>
+                    <input type="text" id="fullName" name="fullName" placeholder="أدخل اسمك الثلاثي" required>
+                    <div class="hint">
+                        <i class="fas fa-info-circle"></i>
+                        الاسم كما هو في الهوية
+                    </div>
+                </div>
+
+                <!-- رقم الهاتف -->
+                <div class="form-group">
+                    <label for="phone">
+                        <i class="fas fa-phone-alt"></i>
+                        رقم الهاتف / الواتساب:
+                    </label>
+                    <input type="tel" id="phone" name="phone" pattern="[0-9]+" placeholder="05xxxxxxxx" title="يرجى إدخال أرقام فقط" required>
+                    <div class="hint">
+                        <i class="fas fa-info-circle"></i>
+                        مثال: 0555123456
+                    </div>
+                </div>
+
+                <!-- الموقع -->
+                <div class="form-group">
+                    <label for="location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        الموقع:
+                    </label>
+                    <input type="text" id="location" name="location" placeholder="المدينة، الحي" required>
+                </div>
+
+                <!-- النوع الرئيسي -->
+                <div class="form-group">
+                    <label for="mainType">
+                        <i class="fas fa-tag"></i>
+                        النوع:
+                    </label>
+                    <select id="mainType" name="mainType" required>
+                        <option value="">-- اختر النوع --</option>
+                        <option value="Complaint">📢 شكوى</option>
+                        <option value="Suggestion">💡 اقتراح</option>
+                    </select>
+                </div>
+
+                <!-- الحقول الفرعية - نوع الشكوى -->
+                <div id="complaintTypeGroup" class="sub-group hidden">
+                    <div class="form-group">
+                        <label for="complaintType">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            نوع الشكوى:
+                        </label>
+                        <select id="complaintType" name="subType">
+                            <option value="">-- اختر نوع الشكوى --</option>
+                            <option value="Sensitive">🔴 شكوى حساسة</option>
+                            <option value="Programmatic">🔵 شكوى برامجية</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- الحقول الفرعية - نوع الاقتراح -->
+                <div id="suggestionTypeGroup" class="sub-group hidden">
+                    <div class="form-group">
+                        <label for="suggestionType">
+                            <i class="fas fa-lightbulb"></i>
+                            نوع الاقتراح:
+                        </label>
+                        <select id="suggestionType" name="subType">
+                            <option value="">-- اختر نوع الاقتراح --</option>
+                            <option value="Future Planning">🎯 تخطيط مستقبلي</option>
+                            <option value="Immediate Improvements">⚡ تحسينات فورية</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- الإجراء المتوقع -->
+                <div class="form-group">
+                    <label for="expectedAction">
+                        <i class="fas fa-clipboard-list"></i>
+                        الإجراء المتوقع:
+                    </label>
+                    <textarea id="expectedAction" name="expectedAction" rows="3" placeholder="ما هو الإجراء الذي تتوقعه منا؟" required></textarea>
+                </div>
+
+                <!-- التفاصيل -->
+                <div class="form-group">
+                    <label for="details">
+                        <i class="fas fa-file-alt"></i>
+                        تفاصيل الشكوى / الاقتراح:
+                    </label>
+                    <textarea id="details" name="details" rows="5" placeholder="يرجى كتابة التفاصيل كاملة..." required></textarea>
+                </div>
+
+                <!-- زر الإرسال -->
+                <button type="submit" id="submitButton" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i>
+                    إرسال
+                </button>
+            </form>
+
+            <!-- معلومات إضافية -->
+            <div class="info-box">
+                <i class="fas fa-shield-alt"></i>
+                <div>
+                    <strong>جميع المعلومات سرية</strong>
+                    <p>نحن نضمن خصوصية وسرية جميع المعلومات المقدمة. يتم التعامل مع الشكاوى والاقتراحات بكل جدية وشفافية.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- إطار مخفي لمعالجة الاستجابة -->
+        <iframe name="hiddenFrame" style="display: none;"></iframe>
+
+        <!-- الفوتر -->
+        <footer class="footer">
+            <div>
+                <i class="fas fa-copyright"></i> 2024 دار للسلام والازدهار. جميع الحقوق محفوظة.
+            </div>
+            <div style="margin-top: 10px;">
+                <a href="#"><i class="fas fa-question-circle"></i> مساعدة</a>
+                <span style="margin: 0 10px;">|</span>
+                <a href="#"><i class="fas fa-lock"></i> سياسة الخصوصية</a>
+                <span style="margin: 0 10px;">|</span>
+                <a href="#"><i class="fas fa-phone-alt"></i> اتصل بنا</a>
+            </div>
+            <div style="margin-top: 15px; font-size: 12px; opacity: 0.7;">
+                نظام إدارة الشكاوى والاقتراحات v1.0 | تطوير بواسطة قسم تقنية المعلومات
+            </div>
+        </footer>
     </div>
 
-    <!-- مؤشر التحميل -->
-    <div id="loadingIndicator" class="loading">
-        ⏳ جاري الإرسال، الرجاء الانتظار...
-    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mainTypeSelect = document.getElementById('mainType');
+            const complaintTypeGroup = document.getElementById('complaintTypeGroup');
+            const suggestionTypeGroup = document.getElementById('suggestionTypeGroup');
+            const complaintTypeSelect = document.getElementById('complaintType');
+            const suggestionTypeSelect = document.getElementById('suggestionType');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const submitButton = document.getElementById('submitButton');
+            const form = document.getElementById('complaintForm');
+            const hiddenFrame = document.getElementsByName('hiddenFrame')[0];
 
-    <!-- النموذج يرسل مباشرة إلى Google Apps Script -->
-    <form id="complaintForm" action="https://script.google.com/macros/s/AKfycbzde98Cylrepb49NX2oWrMbEEptp4vbVFp9adejeSZPG70nt1-eg0MIuEcjOozi-zh9-A/exec" method="POST" target="hiddenFrame">
-        
-        <div class="form-group">
-            <label for="fullName">الاسم الكامل:</label>
-            <input type="text" id="fullName" name="fullName" required>
-        </div>
-
-        <div class="form-group">
-            <label for="phone">رقم الهاتف/الواتساب:</label>
-            <input type="tel" id="phone" name="phone" pattern="[0-9]+" title="يرجى إدخال أرقام فقط" required>
-        </div>
-
-        <div class="form-group">
-            <label for="location">الموقع:</label>
-            <input type="text" id="location" name="location" required>
-        </div>
-
-        <div class="form-group">
-            <label for="mainType">النوع:</label>
-            <select id="mainType" name="mainType" required>
-                <option value="">-- اختر النوع --</option>
-                <option value="Complaint">شكوى</option>
-                <option value="Suggestion">اقتراح</option>
-            </select>
-        </div>
-
-        <div class="form-group hidden" id="complaintTypeGroup">
-            <label for="complaintType">نوع الشكوى:</label>
-            <select id="complaintType" name="subType">
-                <option value="">-- اختر نوع الشكوى --</option>
-                <option value="Sensitive">شكوى حساسة</option>
-                <option value="Programmatic">شكوى برامجية</option>
-            </select>
-        </div>
-
-        <div class="form-group hidden" id="suggestionTypeGroup">
-            <label for="suggestionType">نوع الاقتراح:</label>
-            <select id="suggestionType" name="subType">
-                <option value="">-- اختر نوع الاقتراح --</option>
-                <option value="Future Planning">تخطيط مستقبلي</option>
-                <option value="Immediate Improvements">تحسينات فورية</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label for="expectedAction">الإجراء المتوقع:</label>
-            <textarea id="expectedAction" name="expectedAction" rows="3" required></textarea>
-        </div>
-        
-        <div class="form-group">
-            <label for="details">تفاصيل الشكوى/الاقتراح:</label>
-            <textarea id="details" name="details" rows="5" required></textarea>
-        </div>
-        
-        <button type="submit" id="submitButton">إرسال</button>
-    </form>
-
-    <!-- إطار مخفي لمعالجة الاستجابة -->
-    <iframe name="hiddenFrame" style="display: none;"></iframe>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const mainTypeSelect = document.getElementById('mainType');
-        const complaintTypeGroup = document.getElementById('complaintTypeGroup');
-        const suggestionTypeGroup = document.getElementById('suggestionTypeGroup');
-        const complaintTypeSelect = document.getElementById('complaintType');
-        const suggestionTypeSelect = document.getElementById('suggestionType');
-        const successMessage = document.getElementById('successMessage');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const form = document.getElementById('complaintForm');
-
-        // التحقق إذا كان هناك رسالة نجاح في URL
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('success') === 'true') {
-            successMessage.style.display = 'block';
-            // إخفاء الرسالة بعد 5 ثواني
-            setTimeout(() => {
-                successMessage.style.display = 'none';
-                // إزالة المعلمة من URL
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }, 5000);
-        }
-
-        // إظهار/إخفاء الحقول الفرعية بناءً على النوع الرئيسي
-        mainTypeSelect.addEventListener('change', function() {
-            complaintTypeGroup.classList.add('hidden');
-            suggestionTypeGroup.classList.add('hidden');
-            complaintTypeSelect.removeAttribute('required');
-            suggestionTypeSelect.removeAttribute('required');
-
-            if (this.value === 'Complaint') {
-                complaintTypeGroup.classList.remove('hidden');
-                complaintTypeSelect.setAttribute('required', 'required');
-            } else if (this.value === 'Suggestion') {
-                suggestionTypeGroup.classList.remove('hidden');
-                suggestionTypeSelect.setAttribute('required', 'required');
+            // التحقق إذا كان هناك رسالة نجاح في URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('success') === 'true') {
+                showSuccessMessage();
             }
-        });
 
-        // معالجة إرسال النموذج
-        form.addEventListener('submit', function(e) {
-            // إظهار مؤشر التحميل
-            loadingIndicator.style.display = 'block';
-            successMessage.style.display = 'none';
-            
-            // السماح للإرسال بالمتابعة بشكل طبيعي
-            // البيانات ستذهب إلى Google Apps Script عبر iframe مخفي
-        });
+            // إظهار/إخفاء الحقول الفرعية مع تأثير حركي
+            mainTypeSelect.addEventListener('change', function() {
+                hideAllSubGroups();
+                
+                if (this.value === 'Complaint') {
+                    complaintTypeGroup.classList.remove('hidden');
+                    complaintTypeGroup.style.animation = 'fadeIn 0.5s ease';
+                    complaintTypeSelect.setAttribute('required', 'required');
+                } else if (this.value === 'Suggestion') {
+                    suggestionTypeGroup.classList.remove('hidden');
+                    suggestionTypeGroup.style.animation = 'fadeIn 0.5s ease';
+                    suggestionTypeSelect.setAttribute('required', 'required');
+                }
+            });
 
-        // الاستماع لتحميل iframe للكشف عن النجاح
-        const hiddenFrame = document.getElementsByName('hiddenFrame')[0];
-        hiddenFrame.addEventListener('load', function() {
-            loadingIndicator.style.display = 'none';
-            // عندما يكتمل التحميل، نظهر رسالة النجاح
-            successMessage.style.display = 'block';
-            form.reset();
-            complaintTypeGroup.classList.add('hidden');
-            suggestionTypeGroup.classList.add('hidden');
-            
-            // إخفاء الرسالة بعد 5 ثواني
-            setTimeout(() => {
+            function hideAllSubGroups() {
+                complaintTypeGroup.classList.add('hidden');
+                suggestionTypeGroup.classList.add('hidden');
+                complaintTypeSelect.removeAttribute('required');
+                suggestionTypeSelect.removeAttribute('required');
+            }
+
+            // التحقق من صحة رقم الهاتف
+            document.getElementById('phone').addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+                if (this.value.length > 10) {
+                    this.value = this.value.slice(0, 10);
+                }
+            });
+
+            // معالجة إرسال النموذج
+            form.addEventListener('submit', function(e) {
+                // التحقق النهائي من الحقول
+                if (!validateForm()) {
+                    e.preventDefault();
+                    return;
+                }
+
+                // إظهار مؤشر التحميل
+                loadingIndicator.style.display = 'block';
                 successMessage.style.display = 'none';
-            }, 5000);
+                errorMessage.style.display = 'none';
+                submitButton.disabled = true;
+                submitButton.style.opacity = '0.6';
+                
+                console.log('📤 جاري إرسال النموذج...');
+                
+                // السماح للإرسال بالمتابعة
+            });
+
+            // دالة التحقق من النموذج
+            function validateForm() {
+                const fullName = document.getElementById('fullName').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const location = document.getElementById('location').value.trim();
+                const mainType = mainTypeSelect.value;
+                const expectedAction = document.getElementById('expectedAction').value.trim();
+                const details = document.getElementById('details').value.trim();
+
+                if (!fullName || fullName.length < 3) {
+                    showError('الرجاء إدخال اسم صحيح (3 أحرف على الأقل)');
+                    return false;
+                }
+
+                if (!phone || phone.length < 9) {
+                    showError('الرجاء إدخال رقم هاتف صحيح (9-10 أرقام)');
+                    return false;
+                }
+
+                if (!location || location.length < 3) {
+                    showError('الرجاء إدخال الموقع');
+                    return false;
+                }
+
+                if (!mainType) {
+                    showError('الرجاء اختيار نوع الطلب');
+                    return false;
+                }
+
+                if (mainType === 'Complaint' && !complaintTypeSelect.value) {
+                    showError('الرجاء اختيار نوع الشكوى');
+                    return false;
+                }
+
+                if (mainType === 'Suggestion' && !suggestionTypeSelect.value) {
+                    showError('الرجاء اختيار نوع الاقتراح');
+                    return false;
+                }
+
+                if (!expectedAction || expectedAction.length < 10) {
+                    showError('الرجاء كتابة الإجراء المتوقع (10 أحرف على الأقل)');
+                    return false;
+                }
+
+                if (!details || details.length < 20) {
+                    showError('الرجاء كتابة التفاصيل كاملة (20 حرف على الأقل)');
+                    return false;
+                }
+
+                return true;
+            }
+
+            function showError(message) {
+                errorMessage.querySelector('span').textContent = `❌ ${message}`;
+                errorMessage.style.display = 'block';
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 5000);
+            }
+
+            function showSuccessMessage() {
+                successMessage.style.display = 'block';
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                    // إزالة المعلمة من URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }, 5000);
+            }
+
+            // الاستماع لتحميل iframe
+            hiddenFrame.addEventListener('load', function() {
+                console.log('📥 تم استلام رد من الخادم');
+                
+                loadingIndicator.style.display = 'none';
+                submitButton.disabled = false;
+                submitButton.style.opacity = '1';
+                
+                try {
+                    // محاولة قراءة محتوى iframe
+                    const frameContent = hiddenFrame.contentDocument || hiddenFrame.contentWindow.document;
+                    const bodyText = frameContent.body ? frameContent.body.textContent : '';
+                    
+                    console.log('📄 محتوى الـ iframe:', bodyText.substring(0, 200));
+                    
+                    // إذا كان الرد ناجحاً
+                    if (bodyText.includes('success') || bodyText.includes('ناجح')) {
+                        showSuccessMessage();
+                        resetForm();
+                    } else {
+                        // تحقق من وجود أخطاء
+                        if (bodyText.includes('error') || bodyText.includes('خطأ')) {
+                            showError('حدث خطأ في معالجة الطلب');
+                        } else {
+                            // افتراض النجاح
+                            showSuccessMessage();
+                            resetForm();
+                        }
+                    }
+                } catch (e) {
+                    console.log('⚠️ لا يمكن قراءة محتوى iframe، افتراض النجاح');
+                    // بسبب CORS قد لا نتمكن من قراءة المحتوى
+                    showSuccessMessage();
+                    resetForm();
+                }
+            });
+
+            // إعادة تعيين النموذج
+            function resetForm() {
+                form.reset();
+                hideAllSubGroups();
+                
+                // إعادة تعيين التنسيق
+                const inputs = form.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    input.style.borderColor = '#e0e0e0';
+                });
+            }
+
+            // إضافة تأثيرات للحقول
+            const inputs = document.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.01)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+
+            console.log('🚀 نموذج الشكاوى والاقتراحات جاهز للاستخدام');
         });
-    });
-</script>
+    </script>
 </body>
 </html>
